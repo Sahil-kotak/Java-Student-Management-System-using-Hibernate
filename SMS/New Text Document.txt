@@ -1,0 +1,46 @@
+import javax.swing.*;
+import org.jfree.chart.*;
+import org.jfree.chart.plot.*;
+import org.jfree.data.category.*;
+import java.io.*;
+import java.sql.*;
+
+class ChartsFrame extends JFrame 
+{
+public static String ViewStudent()
+{
+	DefaultCategoryDataset ds = new DefaultCategoryDataset();	
+	String data = "";
+	Configuration cfg = new Configuration();
+	cfg.configure("hibernate.cfg.xml");
+
+	SessionFactory sf = cfg.buildSessionFactory();
+	Session s = null;
+	Transaction t = null;
+
+	try {
+		s = sf.openSession();
+		System.out.println("open");
+		java.util.List<Student> stu = new ArrayList<>();
+		stu = s.createQuery("from Student").list();
+		for(Student i: stu) {
+			data =data + i +"\n";
+			ds.addValue(data);
+		}
+	}
+	catch(Exception e ) {
+		System.out.println("issue " + e);
+	}
+	finally {
+		s.close();
+		System.out.println("close");
+	}
+	return data;
+}
+	JFreeChart chart = ChartFactory.createBarChart("Student's Perf","Subject","Marks",ds,
+	PlotOrientation.VERTICAL,true,true,true);
+
+
+	ChartPanel panel = new ChartPanel(chart);
+	setContentPane(panel);
+
